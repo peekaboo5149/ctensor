@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "maths/complex.h"
+#include "maths/complex/complex.h"
 
 int main(void)
 {

@@ -1,7 +1,7 @@
 #include <criterion/criterion.h>
 #include <math.h>
 
-#include "maths/complex.h"
+#include "maths/complex/complex.h"
 
 #define EPS32 1e-5f
 #define EPS64 1e-10
