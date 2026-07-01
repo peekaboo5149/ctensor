@@ -292,6 +292,42 @@ bool tensor_set(
     return true;
 }
 
+bool tensor_fill(
+    tensor *t,
+    const void *value)
+{
+
+    if (t == NULL)
+    {
+        fprintf(stderr,
+                "tensor_fill: tensor cannot be NULL\n");
+        return false;
+    }
+
+    if (value == NULL)
+    {
+        fprintf(stderr,
+                "tensor_fill: value cannot be NULL\n");
+        return false;
+    }
+
+    char *data = (char *)t->data;
+
+    FOR_U64(i, t->length)
+    {
+        memcpy(
+            data + i * t->elem_size,
+            value,
+            t->elem_size);
+    }
+
+    FOR_U32(i, t->ndim)
+    {
+    }
+
+    return true;
+}
+
 void tensor_destroy(tensor *t)
 {
     if (t == NULL)

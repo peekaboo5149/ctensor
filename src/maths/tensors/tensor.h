@@ -205,6 +205,18 @@ bool tensor_set(
     tensor *t,
     const u64 *indices,
     const void *value);
+
+/**
+ * @brief Fills every element of a tensor with the specified value.
+ *
+ * Copies the value pointed to by @p value into every element of the tensor.
+ * The input buffer must contain exactly one element of the tensor's data type.
+ *
+ * @param t Pointer to the tensor.
+ * @param value Pointer to the value used to fill the tensor.
+ *
+ * @return true on success, false on failure.
+ */
 bool tensor_fill(
     tensor *t,
     const void *value);

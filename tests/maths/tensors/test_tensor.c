@@ -1348,6 +1348,71 @@ Test(tensor_set, null_value)
     tensor_destroy(t);
 }
 
+Test(tensor_fill, f32)
+{
+    u64 shape[] = {2, 3};
+
+    tensor *t = tensor_create(
+        TENSOR_F32,
+        2,
+        shape);
+
+    cr_assert_not_null(t);
+
+    f32 value = 3.14f;
+
+    cr_assert(tensor_fill(t, &value));
+
+    f32 *data = t->data;
+
+    for (u64 i = 0; i < t->length; i++)
+        cr_expect_float_eq(data[i], 3.14f, 1e-6);
+
+    tensor_destroy(t);
+}
+
+Test(tensor_fill, complex32)
+{
+    u64 shape[] = {4};
+
+    tensor *t = tensor_create(
+        TENSOR_C32,
+        1,
+        shape);
+
+    cr_assert_not_null(t);
+
+    complex32 value = {1.5f, -2.5f};
+
+    cr_assert(tensor_fill(t, &value));
+
+    complex32 *data = t->data;
+
+    for (u64 i = 0; i < t->length; i++)
+    {
+        cr_expect_float_eq(data[i].real, 1.5f, 1e-6);
+        cr_expect_float_eq(data[i].img, -2.5f, 1e-6);
+    }
+
+    tensor_destroy(t);
+}
+
+Test(tensor_fill, null_value)
+{
+    u64 shape[] = {2};
+
+    tensor *t = tensor_create(
+        TENSOR_I32,
+        1,
+        shape);
+
+    cr_assert_not_null(t);
+
+    cr_expect_not(tensor_fill(t, NULL));
+
+    tensor_destroy(t);
+}
+
 Test(tensor_destroy, destroy_null_tensor)
 {
     tensor_destroy(NULL);
