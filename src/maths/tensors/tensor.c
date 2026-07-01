@@ -62,6 +62,26 @@ tensor *tensor_create(
         shape);
 }
 
+tensor *tensor_create_custom(
+    size_t elem_size,
+    u32 ndim,
+    const u64 *shape)
+{
+    if (elem_size == 0)
+    {
+        fprintf(stderr,
+                "tensor_create_custom: elem_size must be greater than zero\n");
+        return NULL;
+    }
+    if (!tensor_validate_args(ndim, shape))
+        return NULL;
+    return tensor_alloc(
+        TENSOR_CUSTOM,
+        elem_size,
+        ndim,
+        shape);
+}
+
 void tensor_destroy(tensor *t)
 {
     if (t == NULL)

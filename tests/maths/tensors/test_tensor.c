@@ -105,6 +105,91 @@ Test(tensor_create, zero_shape_entry_returns_null)
     cr_expect_null(t);
 }
 
+typedef struct
+{
+    int id;
+    float value;
+} custom_type;
+
+Test(tensor_create_custom, creates_custom_tensor)
+{
+    u64 shape[] = {2, 3};
+
+    tensor *t = tensor_create_custom(
+        sizeof(custom_type),
+        2,
+        shape);
+
+    cr_assert_not_null(t);
+
+    cr_expect_eq(t->dtype, TENSOR_CUSTOM);
+    cr_expect_eq(t->elem_size, sizeof(custom_type));
+
+    cr_expect_eq(t->ndim, 2);
+
+    cr_expect_eq(t->length, 6);
+
+    cr_expect_eq(
+        t->bytes,
+        6 * sizeof(custom_type));
+
+    cr_expect_eq(t->shape[0], 2);
+    cr_expect_eq(t->shape[1], 3);
+
+    cr_expect_eq(t->strides[0], 3);
+    cr_expect_eq(t->strides[1], 1);
+
+    cr_assert_not_null(t->data);
+
+    tensor_destroy(t);
+}
+
+Test(tensor_create_custom, zero_elem_size_returns_null)
+{
+    u64 shape[] = {2, 2};
+
+    tensor *t = tensor_create_custom(
+        0,
+        2,
+        shape);
+
+    cr_expect_null(t);
+}
+
+Test(tensor_create_custom, zero_ndim_returns_null)
+{
+    u64 shape[] = {2};
+
+    tensor *t = tensor_create_custom(
+        sizeof(custom_type),
+        0,
+        shape);
+
+    cr_expect_null(t);
+}
+
+Test(tensor_create_custom, null_shape_returns_null)
+{
+    tensor *t = tensor_create_custom(
+        sizeof(custom_type),
+        2,
+        NULL);
+
+    cr_expect_null(t);
+}
+
+Test(tensor_create_custom, zero_shape_dimension_returns_null)
+{
+    u64 shape[] = {4, 0, 2};
+
+    tensor *t = tensor_create_custom(
+        sizeof(custom_type),
+        3,
+        shape);
+
+    cr_expect_null(t);
+}
+
 Test(tensor_destroy, destroy_null_tensor)
 {
     tensor_destroy(NULL);

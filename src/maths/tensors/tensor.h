@@ -78,6 +78,42 @@ tensor *tensor_create_custom(
     u32 ndim,
     const u64 *shape);
 
+tensor *tensor_from_data(
+    tensor_dtype dtype,
+    u32 ndim,
+    const u64 *shape,
+    const void *data);
+
+tensor *tensor_from_custom_data(
+    size_t elem_size,
+    u32 ndim,
+    const u64 *shape,
+    const void *data);
+
+tensor *tensor_from_buffer(
+    tensor_dtype dtype,
+    u32 ndim,
+    const u64 *shape,
+    void *buffer);
+
+void *tensor_ptr(
+    const tensor *t,
+    const u64 *indices);
+
+bool tensor_get(
+    const tensor *t,
+    const u64 *indices,
+    void *out);
+
+bool tensor_set(
+    tensor *t,
+    const u64 *indices,
+    const void *value);
+
+bool tensor_fill(
+    tensor *t,
+    const void *value);
+
 /**
  * @brief Releases all resources owned by a tensor.
  *
