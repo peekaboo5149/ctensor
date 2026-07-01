@@ -514,6 +514,232 @@ Test(tensor_from_data, data_pointer_is_not_source_pointer)
     tensor_destroy(t);
 }
 
+typedef struct
+{
+    i32 id;
+    f32 salary;
+} employee;
+
+typedef struct
+{
+    u64 x;
+    u64 y;
+    u64 z;
+} point3d;
+
+Test(tensor_from_custom_data, creates_tensor)
+{
+    u64 shape[] = {2};
+
+    employee employees[] =
+        {
+            {1, 1000.0f},
+            {2, 2500.5f}};
+
+    tensor *t =
+        tensor_from_custom_data(
+            sizeof(employee),
+            1,
+            shape,
+            employees);
+
+    cr_assert_not_null(t);
+
+    cr_expect_eq(t->dtype, TENSOR_CUSTOM);
+    cr_expect_eq(t->elem_size, sizeof(employee));
+    cr_expect_eq(t->length, 2);
+    cr_expect_eq(t->bytes, 2 * sizeof(employee));
+
+    employee *ptr = (employee *)t->data;
+
+    cr_expect_eq(ptr[0].id, 1);
+    cr_expect_float_eq(ptr[0].salary, 1000.0f, 1e-6);
+
+    cr_expect_eq(ptr[1].id, 2);
+    cr_expect_float_eq(ptr[1].salary, 2500.5f, 1e-6);
+
+    tensor_destroy(t);
+}
+
+Test(tensor_from_custom_data, performs_deep_copy)
+{
+    u64 shape[] = {2};
+
+    employee employees[] =
+        {
+            {1, 100},
+            {2, 200}};
+
+    tensor *t =
+        tensor_from_custom_data(
+            sizeof(employee),
+            1,
+            shape,
+            employees);
+
+    cr_assert_not_null(t);
+
+    employees[0].id = 999;
+    employees[0].salary = 9999;
+
+    employee *ptr = (employee *)t->data;
+
+    cr_expect_eq(ptr[0].id, 1);
+    cr_expect_float_eq(ptr[0].salary, 100, 1e-6);
+
+    tensor_destroy(t);
+}
+
+Test(tensor_from_custom_data, multidimensional)
+{
+    u64 shape[] = {2, 2};
+
+    point3d points[2][2] =
+        {
+            {{1, 2, 3},
+             {4, 5, 6}},
+            {{7, 8, 9},
+             {10, 11, 12}}};
+
+    tensor *t =
+        tensor_from_custom_data(
+            sizeof(point3d),
+            2,
+            shape,
+            points);
+
+    cr_assert_not_null(t);
+
+    point3d *ptr = t->data;
+
+    cr_expect_eq(ptr[0].x, 1);
+    cr_expect_eq(ptr[3].z, 12);
+
+    cr_expect_eq(t->strides[0], 2);
+    cr_expect_eq(t->strides[1], 1);
+
+    tensor_destroy(t);
+}
+
+Test(tensor_from_custom_data, metadata)
+{
+    u64 shape[] = {4};
+
+    employee employees[4] = {0};
+
+    tensor *t =
+        tensor_from_custom_data(
+            sizeof(employee),
+            1,
+            shape,
+            employees);
+
+    cr_assert_not_null(t);
+
+    cr_expect_eq(t->dtype, TENSOR_CUSTOM);
+    cr_expect_eq(t->elem_size, sizeof(employee));
+    cr_expect_eq(t->length, 4);
+    cr_expect_eq(t->bytes, 4 * sizeof(employee));
+
+    tensor_destroy(t);
+}
+
+Test(tensor_from_custom_data, allocates_new_storage)
+{
+    u64 shape[] = {2};
+
+    employee employees[2] = {0};
+
+    tensor *t =
+        tensor_from_custom_data(
+            sizeof(employee),
+            1,
+            shape,
+            employees);
+
+    cr_assert_not_null(t);
+
+    cr_expect_neq(t->data, employees);
+
+    tensor_destroy(t);
+}
+
+Test(tensor_from_custom_data, null_data)
+{
+    u64 shape[] = {2};
+
+    tensor *t =
+        tensor_from_custom_data(
+            sizeof(employee),
+            1,
+            shape,
+            NULL);
+
+    cr_expect_null(t);
+}
+
+Test(tensor_from_custom_data, zero_elem_size)
+{
+    u64 shape[] = {2};
+
+    employee employees[2] = {0};
+
+    tensor *t =
+        tensor_from_custom_data(
+            0,
+            1,
+            shape,
+            employees);
+
+    cr_expect_null(t);
+}
+
+Test(tensor_from_custom_data, null_shape)
+{
+    employee employees[2] = {0};
+
+    tensor *t =
+        tensor_from_custom_data(
+            sizeof(employee),
+            1,
+            NULL,
+            employees);
+
+    cr_expect_null(t);
+}
+
+Test(tensor_from_custom_data, zero_ndim)
+{
+    u64 shape[] = {2};
+
+    employee employees[2] = {0};
+
+    tensor *t =
+        tensor_from_custom_data(
+            sizeof(employee),
+            0,
+            shape,
+            employees);
+
+    cr_expect_null(t);
+}
+
+Test(tensor_from_custom_data, zero_shape_dimension)
+{
+    u64 shape[] = {2, 0};
+
+    employee employees[2] = {0};
+
+    tensor *t =
+        tensor_from_custom_data(
+            sizeof(employee),
+            2,
+            shape,
+            employees);
+
+    cr_expect_null(t);
+}
+
 Test(tensor_destroy, destroy_null_tensor)
 {
     tensor_destroy(NULL);

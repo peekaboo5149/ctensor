@@ -109,6 +109,20 @@ tensor *tensor_from_data(
     const u64 *shape,
     const void *data);
 
+/**
+ * @brief Creates a tensor by copying data from a contiguous memory buffer.
+ *
+ * The returned tensor stores elements of a user-defined type and owns its
+ * internal storage. The caller retains ownership of @p data and may modify
+ * or free it after this function returns.
+ *
+ * @param elem_size Size of each element in bytes.
+ * @param ndim Number of tensor dimensions.
+ * @param shape Array of dimension sizes.
+ * @param data Pointer to the source data buffer.
+ *
+ * @return A newly allocated tensor on success, or NULL on failure.
+ */
 tensor *tensor_from_custom_data(
     size_t elem_size,
     u32 ndim,

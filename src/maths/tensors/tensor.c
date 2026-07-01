@@ -88,17 +88,38 @@ tensor *tensor_from_data(
     const u64 *shape,
     const void *data)
 {
+    if (data == NULL)
+    {
+        fprintf(stderr,
+                "tensor_from_data: data cannot be NULL\n");
+        return NULL;
+    }
     tensor *t = tensor_create(dtype, ndim, shape);
     if (t == NULL)
     {
         perror("tensor_from_data");
         return NULL;
     }
+    memcpy(t->data, data, t->bytes);
+    return t;
+}
+
+tensor *tensor_from_custom_data(
+    size_t elem_size,
+    u32 ndim,
+    const u64 *shape,
+    const void *data)
+{
     if (data == NULL)
     {
         fprintf(stderr,
                 "tensor_from_data: data cannot be NULL\n");
-        tensor_destroy(t);
+        return NULL;
+    }
+    tensor *t = tensor_create_custom(elem_size, ndim, shape);
+    if (t == NULL)
+    {
+        perror("tensor_from_data");
         return NULL;
     }
     memcpy(t->data, data, t->bytes);
