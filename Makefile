@@ -9,7 +9,7 @@ TARGET := $(BUILD_DIR)/main
 # SOURCES := $(filter-out $(SRC_DIR)/main.c,$(wildcard $(SRC_DIR)/*.c))
 SOURCES := $(shell find src -type f -name "*.c" | grep -v "src/main.c")
 MAIN := $(SRC_DIR)/main.c
-TEST_SOURCES := $(wildcard $(TEST_DIR)/*.c)
+TEST_SOURCES := $(shell find $(TEST_DIR) -type f -name "*.c")
 
 CRITERION_CFLAGS := $(shell pkg-config --cflags criterion)
 CRITERION_LIBS := $(shell pkg-config --libs criterion)

@@ -168,10 +168,16 @@ typedef int64_t i64;
 #define DEFAULT_IF_NULL(ptr, value) \
     ((ptr) ? (ptr) : (value))
 
-#define NEW(ptr) malloc(sizeof(*(ptr)))
-#define NEW_ZERO(ptr) calloc(1, sizeof(*(ptr)))
-#define NEW_ARRAY(ptr, n) malloc(sizeof(*(ptr)) * (n))
-#define NEW_ARRAY_ZERO(ptr, n) calloc((n), sizeof(*(ptr)))
+#define NEW(type) ((type *)malloc(sizeof(type)))
+#define NEW_ZERO(type) ((type *)calloc(1, sizeof(type)))
+
+#define NEW_ARRAY(type, count) \
+    ((type *)malloc(sizeof(type) * (count)))
+
+#define NEW_ARRAY_ZERO(type, count) \
+    ((type *)calloc((count), sizeof(type)))
+
+#define DELETE(ptr) free(ptr)
 
 #define REPEAT(n) \
     for (u32 _ = 0; _ < (n); ++_)
