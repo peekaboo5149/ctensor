@@ -23,15 +23,37 @@ static bool tensor_validate_args(
     const u64 *shape);
 
 /**
- * @brief Allocates and initializes a tensor.
+ * @brief Allocates and initializes a tensor's metadata.
  *
- * Assumes all arguments have already been validated.
+ * Allocates a new tensor object and initializes all metadata, including
+ * the shape, strides, element count, and memory footprint. This function
+ * does not allocate the backing data buffer.
+ *
+ * @param dtype Tensor element data type.
+ * @param elem_size Size of each element in bytes.
+ * @param ndim Number of tensor dimensions.
+ * @param shape Array of dimension sizes.
+ *
+ * @return A newly allocated tensor on success, or NULL on failure.
  */
-static tensor *tensor_alloc(
+static tensor *tensor_init(
     tensor_dtype dtype,
     size_t elem_size,
     u32 ndim,
     const u64 *shape);
+
+/**
+ * @brief Allocates the backing data buffer for a tensor.
+ *
+ * Allocates zero-initialized storage for all tensor elements and marks the
+ * tensor as owning the allocated memory.
+ *
+ * @param t Tensor to allocate storage for.
+ *
+ * @return true if the allocation succeeds, false otherwise.
+ */
+static bool tensor_alloc_data(
+    tensor *t);
 
 tensor *tensor_create(
     tensor_dtype dtype,
@@ -55,11 +77,22 @@ tensor *tensor_create(
     if (!tensor_validate_args(ndim, shape))
         return NULL;
 
-    return tensor_alloc(
+    tensor *t = tensor_init(
         dtype,
         tensor_dtype_size(dtype),
         ndim,
         shape);
+
+    if (t == NULL)
+        return NULL;
+
+    if (!tensor_alloc_data(t))
+    {
+        tensor_destroy(t);
+        return NULL;
+    }
+
+    return t;
 }
 
 tensor *tensor_create_custom(
@@ -75,11 +108,22 @@ tensor *tensor_create_custom(
     }
     if (!tensor_validate_args(ndim, shape))
         return NULL;
-    return tensor_alloc(
+    tensor *t = tensor_init(
         TENSOR_CUSTOM,
         elem_size,
         ndim,
         shape);
+
+    if (t == NULL)
+        return NULL;
+
+    if (!tensor_alloc_data(t))
+    {
+        tensor_destroy(t);
+        return NULL;
+    }
+
+    return t;
 }
 
 tensor *tensor_from_data(
@@ -124,6 +168,16 @@ tensor *tensor_from_custom_data(
     }
     memcpy(t->data, data, t->bytes);
     return t;
+}
+
+tensor *tensor_from_buffer(
+    tensor_dtype dtype,
+    u32 ndim,
+    const u64 *shape,
+    void *buffer)
+{
+    printf("NOT IMPLEMENTED"); // IMPLEMENT THIS OR TEST ARE FAILING IN MAIN 😩
+    return NULL;
 }
 
 void tensor_destroy(tensor *t)
@@ -172,7 +226,7 @@ static bool tensor_validate_args(
     return true;
 }
 
-static tensor *tensor_alloc(
+static tensor *tensor_init(
     tensor_dtype dtype,
     size_t elem_size,
     u32 ndim,
@@ -187,8 +241,8 @@ static tensor *tensor_alloc(
 
     t->dtype = dtype;
     t->ndim = ndim;
-    t->owns_data = true;
     t->elem_size = elem_size;
+    t->owns_data = false;
 
     t->shape = NEW_ARRAY(u64, ndim);
     if (t->shape == NULL)
@@ -244,15 +298,22 @@ static tensor *tensor_alloc(
             t->strides[i + 1] * t->shape[i + 1];
     }
 
+    return t;
+}
+
+static bool tensor_alloc_data(tensor *t)
+{
     t->data = calloc(t->length, t->elem_size);
+
     if (t->data == NULL)
     {
-        tensor_destroy(t);
         perror("tensor_create");
-        return NULL;
+        return false;
     }
 
-    return t;
+    t->owns_data = true;
+
+    return true;
 }
 
 static size_t tensor_dtype_size(tensor_dtype dtype)

@@ -129,6 +129,21 @@ tensor *tensor_from_custom_data(
     const u64 *shape,
     const void *data);
 
+/**
+ * @brief Creates a tensor that wraps an existing memory buffer.
+ *
+ * No memory is allocated or copied. The tensor directly references the
+ * supplied buffer and does not take ownership of it. The caller is
+ * responsible for ensuring that the buffer remains valid for the lifetime
+ * of the tensor.
+ *
+ * @param dtype Tensor element data type.
+ * @param ndim Number of tensor dimensions.
+ * @param shape Array of dimension sizes.
+ * @param buffer Pointer to a contiguous memory buffer.
+ *
+ * @return A newly allocated tensor on success, or NULL on failure.
+ */
 tensor *tensor_from_buffer(
     tensor_dtype dtype,
     u32 ndim,

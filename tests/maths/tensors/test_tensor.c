@@ -740,6 +740,252 @@ Test(tensor_from_custom_data, zero_shape_dimension)
     cr_expect_null(t);
 }
 
+Test(tensor_from_buffer, creates_tensor)
+{
+    u64 shape[] = {2, 3};
+
+    f32 values[] =
+        {
+            1, 2, 3,
+            4, 5, 6};
+
+    tensor *t =
+        tensor_from_buffer(
+            TENSOR_F32,
+            2,
+            shape,
+            values);
+
+    cr_assert_not_null(t);
+
+    cr_expect_eq(t->dtype, TENSOR_F32);
+    cr_expect_eq(t->elem_size, sizeof(f32));
+
+    cr_expect_eq(t->length, 6);
+
+    cr_expect_eq(
+        t->bytes,
+        6 * sizeof(f32));
+
+    cr_expect_eq(
+        t->owns_data,
+        false);
+
+    cr_expect_eq(
+        t->data,
+        values);
+
+    tensor_destroy(t);
+}
+
+Test(tensor_from_buffer, reflects_buffer_changes)
+{
+    u64 shape[] = {4};
+
+    f32 values[] =
+        {
+            1, 2, 3, 4};
+
+    tensor *t =
+        tensor_from_buffer(
+            TENSOR_F32,
+            1,
+            shape,
+            values);
+
+    cr_assert_not_null(t);
+
+    values[2] = 100;
+
+    cr_expect_float_eq(
+        ((f32 *)t->data)[2],
+        100,
+        1e-6);
+
+    tensor_destroy(t);
+}
+
+Test(tensor_from_buffer, writes_to_original_buffer)
+{
+    u64 shape[] = {4};
+
+    f32 values[] =
+        {
+            1, 2, 3, 4};
+
+    tensor *t =
+        tensor_from_buffer(
+            TENSOR_F32,
+            1,
+            shape,
+            values);
+
+    ((f32 *)t->data)[0] = 99;
+
+    cr_expect_float_eq(
+        values[0],
+        99,
+        1e-6);
+
+    tensor_destroy(t);
+}
+
+Test(tensor_from_buffer, does_not_allocate_new_buffer)
+{
+    u64 shape[] = {2};
+
+    i32 values[] =
+        {
+            10,
+            20};
+
+    tensor *t =
+        tensor_from_buffer(
+            TENSOR_I32,
+            1,
+            shape,
+            values);
+
+    cr_assert_not_null(t);
+
+    cr_expect_eq(
+        t->data,
+        values);
+
+    tensor_destroy(t);
+}
+
+Test(tensor_from_buffer, null_buffer)
+{
+    u64 shape[] = {2};
+
+    tensor *t =
+        tensor_from_buffer(
+            TENSOR_F32,
+            1,
+            shape,
+            NULL);
+
+    cr_expect_null(t);
+}
+
+Test(tensor_from_buffer, invalid_dtype)
+{
+    u64 shape[] = {2};
+
+    f32 values[] =
+        {
+            1, 2};
+
+    tensor *t =
+        tensor_from_buffer(
+            TENSOR_DTYPE_UNKNOWN,
+            1,
+            shape,
+            values);
+
+    cr_expect_null(t);
+}
+
+Test(tensor_from_buffer, custom_dtype)
+{
+    u64 shape[] = {2};
+
+    i32 values[] =
+        {
+            1,
+            2};
+
+    tensor *t =
+        tensor_from_buffer(
+            TENSOR_CUSTOM,
+            1,
+            shape,
+            values);
+
+    cr_expect_null(t);
+}
+
+Test(tensor_from_buffer, null_shape)
+{
+    f32 values[] =
+        {
+            1,
+            2};
+
+    tensor *t =
+        tensor_from_buffer(
+            TENSOR_F32,
+            1,
+            NULL,
+            values);
+
+    cr_expect_null(t);
+}
+
+Test(tensor_from_buffer, zero_ndim)
+{
+    u64 shape[] = {2};
+
+    f32 values[] =
+        {
+            1,
+            2};
+
+    tensor *t =
+        tensor_from_buffer(
+            TENSOR_F32,
+            0,
+            shape,
+            values);
+
+    cr_expect_null(t);
+}
+
+Test(tensor_from_buffer, zero_dimension)
+{
+    u64 shape[] =
+        {
+            2,
+            0};
+
+    f32 values[] =
+        {
+            1,
+            2};
+
+    tensor *t =
+        tensor_from_buffer(
+            TENSOR_F32,
+            2,
+            shape,
+            values);
+
+    cr_expect_null(t);
+}
+
+Test(tensor_from_buffer, computes_strides)
+{
+    u64 shape[] = {2, 3, 4};
+
+    f32 values[24] = {0};
+
+    tensor *t =
+        tensor_from_buffer(
+            TENSOR_F32,
+            3,
+            shape,
+            values);
+
+    cr_assert_not_null(t);
+
+    cr_expect_eq(t->strides[0], 12);
+    cr_expect_eq(t->strides[1], 4);
+    cr_expect_eq(t->strides[2], 1);
+
+    tensor_destroy(t);
+}
+
 Test(tensor_destroy, destroy_null_tensor)
 {
     tensor_destroy(NULL);
