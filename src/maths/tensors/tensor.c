@@ -176,8 +176,43 @@ tensor *tensor_from_buffer(
     const u64 *shape,
     void *buffer)
 {
-    printf("NOT IMPLEMENTED"); // IMPLEMENT THIS OR TEST ARE FAILING IN MAIN 😩
-    return NULL;
+    if (dtype == TENSOR_DTYPE_UNKNOWN)
+    {
+        fprintf(stderr,
+                "tensor_from_buffer: dtype cannot be of type TENSOR_DTYPE_UNKNOWN\n");
+        return NULL;
+    }
+
+    if (dtype == TENSOR_CUSTOM)
+    {
+        fprintf(stderr,
+                "tensor_from_buffer: cannot be used to create tensor for custom dtype\n");
+        return NULL;
+    }
+
+    if (buffer == NULL)
+    {
+        fprintf(stderr,
+                "tensor_from_buffer: buffer cannot be NULL\n");
+        return NULL;
+    }
+
+    if (!tensor_validate_args(ndim, shape))
+        return NULL;
+
+    tensor *t = tensor_init(
+        dtype,
+        tensor_dtype_size(dtype),
+        ndim,
+        shape);
+
+    if (t == NULL)
+        return NULL;
+
+    t->data = buffer;
+    t->owns_data = false;
+
+    return t;
 }
 
 void tensor_destroy(tensor *t)
