@@ -82,6 +82,29 @@ tensor *tensor_create_custom(
         shape);
 }
 
+tensor *tensor_from_data(
+    tensor_dtype dtype,
+    u32 ndim,
+    const u64 *shape,
+    const void *data)
+{
+    tensor *t = tensor_create(dtype, ndim, shape);
+    if (t == NULL)
+    {
+        perror("tensor_from_data");
+        return NULL;
+    }
+    if (data == NULL)
+    {
+        fprintf(stderr,
+                "tensor_from_data: data cannot be NULL\n");
+        tensor_destroy(t);
+        return NULL;
+    }
+    memcpy(t->data, data, t->bytes);
+    return t;
+}
+
 void tensor_destroy(tensor *t)
 {
     if (t == NULL)

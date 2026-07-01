@@ -78,6 +78,31 @@ tensor *tensor_create_custom(
     u32 ndim,
     const u64 *shape);
 
+/**
+ * @brief Creates a tensor by copying data from a contiguous memory buffer.
+ *
+ * The returned tensor owns its internal storage. The caller retains ownership
+ * of @p data and may modify or free it after this function returns.
+ *
+ * Example:
+ *
+ *     u64 shape[] = {2, 3};
+ *     f32 values[] = {1, 2, 3, 4, 5, 6};
+ *
+ *     tensor *t = tensor_from_data(
+ *         TENSOR_F32,
+ *         2,
+ *         shape,
+ *         values
+ *     );
+ *
+ * @param dtype Tensor element data type.
+ * @param ndim Number of tensor dimensions.
+ * @param shape Array of dimension sizes.
+ * @param data Pointer to the source data buffer.
+ *
+ * @return A newly allocated tensor on success, or NULL on failure.
+ */
 tensor *tensor_from_data(
     tensor_dtype dtype,
     u32 ndim,
