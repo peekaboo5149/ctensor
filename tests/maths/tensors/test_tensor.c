@@ -986,6 +986,227 @@ Test(tensor_from_buffer, computes_strides)
     tensor_destroy(t);
 }
 
+Test(tensor_ptr, f32_1d)
+{
+    u64 shape[] = {4};
+
+    f32 values[] =
+        {
+            10, 20, 30, 40};
+
+    tensor *t =
+        tensor_from_buffer(
+            TENSOR_F32,
+            1,
+            shape,
+            values);
+
+    u64 idx[] = {2};
+
+    f32 *x = tensor_ptr(t, idx);
+
+    cr_assert_not_null(x);
+
+    cr_expect_float_eq(*x, 30, 1e-6);
+
+    tensor_destroy(t);
+}
+
+Test(tensor_ptr, i32_2d)
+{
+    u64 shape[] = {2, 3};
+
+    i32 values[2][3] =
+        {
+            {1, 2, 3},
+            {4, 5, 6}};
+
+    tensor *t =
+        tensor_from_buffer(
+            TENSOR_I32,
+            2,
+            shape,
+            values);
+
+    u64 idx[] = {1, 2};
+
+    i32 *x = tensor_ptr(t, idx);
+
+    cr_assert_not_null(x);
+
+    cr_expect_eq(*x, 6);
+
+    tensor_destroy(t);
+}
+
+Test(tensor_ptr, u64_3d)
+{
+    u64 shape[] = {2, 2, 2};
+
+    u64 values[2][2][2] =
+        {
+            {{1, 2},
+             {3, 4}},
+            {{5, 6},
+             {7, 8}}};
+
+    tensor *t =
+        tensor_from_buffer(
+            TENSOR_U64,
+            3,
+            shape,
+            values);
+
+    u64 idx[] = {1, 0, 1};
+
+    u64 *x = tensor_ptr(t, idx);
+
+    cr_assert_not_null(x);
+
+    cr_expect_eq(*x, 6);
+
+    tensor_destroy(t);
+}
+
+Test(tensor_ptr, complex32)
+{
+    u64 shape[] = {2, 2};
+
+    complex32 values[2][2] =
+        {
+            {{.real = 1, .img = 2},
+             {.real = 3, .img = 4}},
+            {{.real = 5, .img = 6},
+             {.real = 7, .img = 8}}};
+
+    tensor *t =
+        tensor_from_buffer(
+            TENSOR_C32,
+            2,
+            shape,
+            values);
+
+    u64 idx[] = {1, 0};
+
+    complex32 *c =
+        tensor_ptr(t, idx);
+
+    cr_assert_not_null(c);
+
+    cr_expect_float_eq(c->real, 5, 1e-6);
+    cr_expect_float_eq(c->img, 6, 1e-6);
+
+    tensor_destroy(t);
+}
+
+Test(tensor_ptr, first_element_address)
+{
+    u64 shape[] = {4};
+
+    i32 values[] =
+        {
+            1, 2, 3, 4};
+
+    tensor *t =
+        tensor_from_buffer(
+            TENSOR_I32,
+            1,
+            shape,
+            values);
+
+    u64 idx[] = {0};
+
+    cr_expect_eq(
+        tensor_ptr(t, idx),
+        values);
+
+    tensor_destroy(t);
+}
+
+Test(tensor_ptr, null_tensor)
+{
+    u64 idx[] = {0};
+
+    cr_expect_null(
+        tensor_ptr(NULL, idx));
+}
+
+Test(tensor_ptr, null_indices)
+{
+    u64 shape[] = {2};
+
+    i32 values[] =
+        {
+            1, 2};
+
+    tensor *t =
+        tensor_from_buffer(
+            TENSOR_I32,
+            1,
+            shape,
+            values);
+
+    cr_expect_null(
+        tensor_ptr(t, NULL));
+
+    tensor_destroy(t);
+}
+
+Test(tensor_ptr, index_out_of_bounds)
+{
+    u64 shape[] = {2, 3};
+
+    i32 values[2][3] =
+        {
+            {1, 2, 3},
+            {4, 5, 6}};
+
+    tensor *t =
+        tensor_from_buffer(
+            TENSOR_I32,
+            2,
+            shape,
+            values);
+
+    u64 idx[] = {1, 3};
+
+    cr_expect_null(
+        tensor_ptr(t, idx));
+
+    tensor_destroy(t);
+}
+
+Test(tensor_ptr, first_dimension_out_of_bounds)
+{
+    u64 shape[] = {2, 3};
+
+    i32 values[2][3] = {0};
+
+    tensor *t =
+        tensor_from_buffer(
+            TENSOR_I32,
+            2,
+            shape,
+            values);
+
+    u64 idx[] = {2, 0};
+
+    cr_expect_null(
+        tensor_ptr(t, idx));
+
+    tensor_destroy(t);
+}
+
+Test(tensor_ptr, null_data)
+{
+    tensor t = {0};
+
+    u64 idx[] = {0};
+
+    cr_expect_null(
+        tensor_ptr(&t, idx));
+}
+
 Test(tensor_destroy, destroy_null_tensor)
 {
     tensor_destroy(NULL);

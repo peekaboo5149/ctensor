@@ -150,6 +150,22 @@ tensor *tensor_from_buffer(
     const u64 *shape,
     void *buffer);
 
+/**
+ * @brief Returns a pointer to the tensor element at the specified indices.
+ *
+ * Computes the address of an element using the tensor's shape and strides
+ * without copying any data. The returned pointer refers directly to the
+ * tensor's underlying storage.
+ *
+ * The number of indices provided must equal the tensor's number of
+ * dimensions (`ndim`), and each index must be within the bounds of the
+ * corresponding dimension.
+ *
+ * @param t Pointer to the tensor.
+ * @param indices Array of indices specifying the element to access.
+ *
+ * @return Pointer to the requested element on success, or NULL on failure.
+ */
 void *tensor_ptr(
     const tensor *t,
     const u64 *indices);

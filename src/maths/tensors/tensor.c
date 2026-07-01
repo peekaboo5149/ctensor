@@ -215,6 +215,41 @@ tensor *tensor_from_buffer(
     return t;
 }
 
+void *tensor_ptr(
+    const tensor *t,
+    const u64 *indices)
+{
+    if (t == NULL)
+    {
+        fprintf(stderr,
+                "tensor_ptr: tensor cannot be NULL\n");
+        return NULL;
+    }
+    if (indices == NULL)
+    {
+        fprintf(stderr,
+                "tensor_ptr: indicies cannot be NULL\n");
+        return NULL;
+    }
+
+    u64 offset = 0;
+    FOR_U32(i, t->ndim)
+    {
+        if (indices[i] >= t->shape[i])
+        {
+            fprintf(stderr,
+                    "tensor_ptr: index %llu is out of bounds for dimension %u (size %llu)\n",
+                    (unsigned long long)indices[i],
+                    i,
+                    (unsigned long long)t->shape[i]);
+            return NULL;
+        }
+        offset += indices[i] * t->strides[i];
+    }
+
+    return (char *)t->data + offset * t->elem_size;
+}
+
 void tensor_destroy(tensor *t)
 {
     if (t == NULL)
