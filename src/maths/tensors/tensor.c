@@ -250,6 +250,48 @@ void *tensor_ptr(
     return (char *)t->data + offset * t->elem_size;
 }
 
+bool tensor_get(
+    const tensor *t,
+    const u64 *indices,
+    void *out)
+{
+    if (out == NULL)
+    {
+        fprintf(stderr,
+                "tensor_get: output buffer cannot be NULL\n");
+        return false;
+    }
+
+    void *ptr = tensor_ptr(t, indices);
+    if (ptr == NULL)
+        return false;
+
+    memcpy(out, ptr, t->elem_size);
+
+    return true;
+}
+
+bool tensor_set(
+    tensor *t,
+    const u64 *indices,
+    const void *value)
+{
+    if (value == NULL)
+    {
+        fprintf(stderr,
+                "tensor_set: value cannot be NULL\n");
+        return false;
+    }
+
+    void *ptr = tensor_ptr(t, indices);
+    if (ptr == NULL)
+        return false;
+
+    memcpy(ptr, value, t->elem_size);
+
+    return true;
+}
+
 void tensor_destroy(tensor *t)
 {
     if (t == NULL)

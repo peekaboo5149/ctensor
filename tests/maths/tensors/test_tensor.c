@@ -1207,6 +1207,147 @@ Test(tensor_ptr, null_data)
         tensor_ptr(&t, idx));
 }
 
+Test(tensor_get, f32)
+{
+    u64 shape[] = {2, 2};
+
+    f32 values[2][2] =
+        {
+            {1, 2},
+            {3, 4}};
+
+    tensor *t = tensor_from_buffer(
+        TENSOR_F32,
+        2,
+        shape,
+        values);
+
+    u64 idx[] = {1, 0};
+
+    f32 out = 0;
+
+    cr_assert(tensor_get(t, idx, &out));
+
+    cr_expect_float_eq(out, 3.0f, 1e-6);
+
+    tensor_destroy(t);
+}
+
+Test(tensor_get, complex32)
+{
+    u64 shape[] = {2};
+
+    complex32 values[] =
+        {
+            {1, 2},
+            {3, 4}};
+
+    tensor *t = tensor_from_buffer(
+        TENSOR_C32,
+        1,
+        shape,
+        values);
+
+    u64 idx[] = {1};
+
+    complex32 out;
+
+    cr_assert(tensor_get(t, idx, &out));
+
+    cr_expect_float_eq(out.real, 3, 1e-6);
+    cr_expect_float_eq(out.img, 4, 1e-6);
+
+    tensor_destroy(t);
+}
+
+Test(tensor_get, null_output)
+{
+    u64 shape[] = {2};
+
+    i32 values[] = {1, 2};
+
+    tensor *t = tensor_from_buffer(
+        TENSOR_I32,
+        1,
+        shape,
+        values);
+
+    u64 idx[] = {0};
+
+    cr_expect_not(tensor_get(t, idx, NULL));
+
+    tensor_destroy(t);
+}
+
+Test(tensor_set, f32)
+{
+    u64 shape[] = {2};
+
+    f32 values[] = {1, 2};
+
+    tensor *t = tensor_from_buffer(
+        TENSOR_F32,
+        1,
+        shape,
+        values);
+
+    u64 idx[] = {1};
+
+    f32 x = 99;
+
+    cr_assert(tensor_set(t, idx, &x));
+
+    cr_expect_float_eq(values[1], 99, 1e-6);
+
+    tensor_destroy(t);
+}
+
+Test(tensor_set, complex32)
+{
+    u64 shape[] = {2};
+
+    complex32 values[] =
+        {
+            {1, 2},
+            {3, 4}};
+
+    tensor *t = tensor_from_buffer(
+        TENSOR_C32,
+        1,
+        shape,
+        values);
+
+    u64 idx[] = {0};
+
+    complex32 c = {10, 20};
+
+    cr_assert(tensor_set(t, idx, &c));
+
+    cr_expect_float_eq(values[0].real, 10, 1e-6);
+    cr_expect_float_eq(values[0].img, 20, 1e-6);
+
+    tensor_destroy(t);
+}
+
+Test(tensor_set, null_value)
+{
+    u64 shape[] = {2};
+
+    i32 values[] = {1, 2};
+
+    tensor *t = tensor_from_buffer(
+        TENSOR_I32,
+        1,
+        shape,
+        values);
+
+    u64 idx[] = {0};
+
+    cr_expect_not(tensor_set(t, idx, NULL));
+
+    tensor_destroy(t);
+}
+
 Test(tensor_destroy, destroy_null_tensor)
 {
     tensor_destroy(NULL);

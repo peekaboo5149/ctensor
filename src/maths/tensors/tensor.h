@@ -170,16 +170,41 @@ void *tensor_ptr(
     const tensor *t,
     const u64 *indices);
 
+/**
+ * @brief Copies the tensor element at the specified indices into a buffer.
+ *
+ * Retrieves the element at the given indices and copies its value into
+ * the memory pointed to by @p out. The output buffer must be large enough
+ * to hold one tensor element.
+ *
+ * @param t Pointer to the tensor.
+ * @param indices Array of indices specifying the element to retrieve.
+ * @param out Pointer to the destination buffer.
+ *
+ * @return true on success, false on failure.
+ */
 bool tensor_get(
     const tensor *t,
     const u64 *indices,
     void *out);
 
+/**
+ * @brief Replaces the tensor element at the specified indices.
+ *
+ * Copies the value pointed to by @p value into the tensor element at the
+ * given indices. The input buffer must contain exactly one element of the
+ * tensor's data type.
+ *
+ * @param t Pointer to the tensor.
+ * @param indices Array of indices specifying the element to modify.
+ * @param value Pointer to the source value.
+ *
+ * @return true on success, false on failure.
+ */
 bool tensor_set(
     tensor *t,
     const u64 *indices,
     const void *value);
-
 bool tensor_fill(
     tensor *t,
     const void *value);
