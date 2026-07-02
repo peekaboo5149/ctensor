@@ -151,6 +151,18 @@ tensor *tensor_from_buffer(
     void *buffer);
 
 /**
+ * @brief Create a custom tensor that wraps an external buffer without copying.
+ *
+ * @param elem_size Size of each element in bytes.
+ * @param ndim Number of tensor dimensions.
+ * @param shape Array of dimension sizes.
+ * @param buffer Pointer to a contiguous memory buffer.
+ *
+ *  */
+tensor *tensor_from_custom_buffer(size_t elem_size, u32 ndim,
+                                  const u64 *shape, void *buffer);
+
+/**
  * @brief Returns a pointer to the tensor element at the specified indices.
  *
  * Computes the address of an element using the tensor's shape and strides

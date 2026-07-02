@@ -215,6 +215,40 @@ tensor *tensor_from_buffer(
     return t;
 }
 
+tensor *tensor_from_custom_buffer(size_t elem_size, u32 ndim,
+                                  const u64 *shape, void *buffer)
+{
+    if (buffer == NULL)
+    {
+        fprintf(stderr,
+                "tensor_from_buffer: buffer cannot be NULL\n");
+        return NULL;
+    }
+    if (!tensor_validate_args(ndim, shape))
+        return NULL;
+
+    if (elem_size == 0)
+    {
+        fprintf(stderr,
+                "tensor_create_custom: elem_size must be greater than zero\n");
+        return NULL;
+    }
+
+    tensor *t = tensor_init(
+        TENSOR_CUSTOM,
+        elem_size,
+        ndim,
+        shape);
+
+    if (t == NULL)
+        return NULL;
+
+    t->data = buffer;
+    t->owns_data = false;
+
+    return t;
+}
+
 void *tensor_ptr(
     const tensor *t,
     const u64 *indices)

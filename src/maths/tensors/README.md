@@ -9,7 +9,7 @@
 | [x]  | `tensor *tensor_from_data(tensor_dtype dtype, u32 ndim, const u64 *shape, const void *data);`      | Create a tensor by copying data from a contiguous memory buffer.        |
 | [x]  | `tensor *tensor_from_custom_data(size_t elem_size, u32 ndim, const u64 *shape, const void *data);` | Create a custom tensor by copying data from a contiguous memory buffer. |
 | [x]  | `tensor *tensor_from_buffer(tensor_dtype dtype, u32 ndim, const u64 *shape, void *buffer);`        | Create a tensor that wraps an external buffer without copying.          |
-| [ ]  | `tensor *tensor_from_custom_buffer(size_t elem_size, u32 ndim, const u64 *shape, void *buffer);`   | Create a custom tensor that wraps an external buffer without copying.   |
+| [x]  | `tensor *tensor_from_custom_buffer(size_t elem_size, u32 ndim, const u64 *shape, void *buffer);`   | Create a custom tensor that wraps an external buffer without copying.   |
 | [x]  | `void tensor_destroy(tensor *t);`                                                                  | Destroy a tensor and release owned resources.                           |
 | [x]  | `void *tensor_ptr(const tensor *t, const u64 *indices);`                                           | Return a pointer to an element using multidimensional indices.          |
 | [x]  | `bool tensor_get(const tensor *t, const u64 *indices, void *out);`                                 | Copy a tensor element into an output buffer.                            |

@@ -1413,6 +1413,115 @@ Test(tensor_fill, null_value)
     tensor_destroy(t);
 }
 
+Test(tensor_from_custom_buffer, creates_tensor)
+{
+    u64 shape[] = {2};
+
+    employee employees[] =
+        {
+            {1, 1000.0f},
+            {2, 2000.0f}};
+
+    tensor *t = tensor_from_custom_buffer(
+        sizeof(employee),
+        1,
+        shape,
+        employees);
+
+    cr_assert_not_null(t);
+
+    cr_expect_eq(t->dtype, TENSOR_CUSTOM);
+    cr_expect_eq(t->elem_size, sizeof(employee));
+    cr_expect_eq(t->length, 2);
+    cr_expect_eq(t->owns_data, false);
+    cr_expect_eq(t->data, employees);
+
+    tensor_destroy(t);
+}
+
+Test(tensor_from_custom_buffer, reflects_buffer_changes)
+{
+    u64 shape[] = {2};
+
+    employee employees[] =
+        {
+            {1, 1000.0f},
+            {2, 2000.0f}};
+
+    tensor *t = tensor_from_custom_buffer(
+        sizeof(employee),
+        1,
+        shape,
+        employees);
+
+    cr_assert_not_null(t);
+
+    employees[0].salary = 9999.0f;
+
+    employee *ptr = (employee *)t->data;
+
+    cr_expect_float_eq(ptr[0].salary, 9999.0f, 1e-6);
+
+    tensor_destroy(t);
+}
+
+Test(tensor_from_custom_buffer, writes_to_original_buffer)
+{
+    u64 shape[] = {2};
+
+    employee employees[] =
+        {
+            {1, 1000.0f},
+            {2, 2000.0f}};
+
+    tensor *t = tensor_from_custom_buffer(
+        sizeof(employee),
+        1,
+        shape,
+        employees);
+
+    cr_assert_not_null(t);
+
+    employee value = {10, 5555.0f};
+
+    u64 idx[] = {1};
+
+    cr_assert(tensor_set(t, idx, &value));
+
+    cr_expect_eq(employees[1].id, 10);
+    cr_expect_float_eq(employees[1].salary, 5555.0f, 1e-6);
+
+    tensor_destroy(t);
+}
+
+Test(tensor_from_custom_buffer, null_buffer)
+{
+    u64 shape[] = {2};
+
+    tensor *t = tensor_from_custom_buffer(
+        sizeof(employee),
+        1,
+        shape,
+        NULL);
+
+    cr_expect_null(t);
+}
+
+Test(tensor_from_custom_buffer, zero_elem_size)
+{
+    u64 shape[] = {2};
+
+    employee employees[2];
+
+    tensor *t = tensor_from_custom_buffer(
+        0,
+        1,
+        shape,
+        employees);
+
+    cr_expect_null(t);
+}
+
 Test(tensor_destroy, destroy_null_tensor)
 {
     tensor_destroy(NULL);
